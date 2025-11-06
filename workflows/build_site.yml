@@ -1,0 +1,38 @@
+name: Aggiorna Sito Web
+
+on:
+  # Permette di eseguire il workflow manualmente dalla tab "Actions"
+  workflow_dispatch:
+  # Esegue il workflow ogni giorno alle 02:00 UTC (le 4:00 in Italia con ora legale)
+  schedule:
+    - cron: '0 2 * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Scarica il codice del repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. Imposta l'ambiente Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      # 3. Esegue il nostro script Python per generare index.html
+      - name: Run script to build page
+        run: python scripts/update_page.py
+
+      # 4. Fa il commit e il push del file index.html generato
+      - name: Commit and push if there are changes
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@github.com"
+          git add index.html
+          # Il comando seguente fa il commit solo se ci sono state modifiche
+          git diff --quiet && git diff --staged --quiet || git commit -m "Aggiornamento automatico del sito"
+          # Usa il token che abbiamo salvato nei segreti per autenticarsi
+          git push https://${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
