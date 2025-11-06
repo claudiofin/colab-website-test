@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
   # Esegue il workflow ogni giorno alle 02:00 UTC (le 4:00 in Italia con ora legale)
   schedule:
-    - cron: '0 2 * * *'
+    - cron: '0 9 1 9 0'
 
 jobs:
   build:
